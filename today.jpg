@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="refresh" content="0;url=https://fakeimg.pl/300x60/ffffff/000000/?text=Wednesday,%20March%2026,%202025&font_size=20">
+</head>
+<body>
+    <script>
+        // Create date string
+        const now = new Date();
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        const dateStr = encodeURIComponent(now.toLocaleDateString('en-US', options));
+        
+        // Redirect to image service
+        window.location.href = `https://fakeimg.pl/300x60/ffffff/000000/?text=${dateStr}&font_size=20`;
+    </script>
+</body>
+</html>
