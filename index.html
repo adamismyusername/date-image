@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dynamic Date Image</title>
+    <style>
+        body, html { 
+            margin: 0; 
+            padding: 0; 
+            background-color: transparent;
+        }
+        canvas { 
+            display: block; 
+        }
+    </style>
+</head>
+<body>
+    <canvas id="dateCanvas" width="300" height="60"></canvas>
+    <script>
+        function drawDate() {
+            const canvas = document.getElementById('dateCanvas');
+            const ctx = canvas.getContext('2d');
+            const now = new Date();
+            const dateString = now.toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw date
+            ctx.fillStyle = 'black';
+            ctx.font = '20px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(dateString, canvas.width/2, canvas.height/2);
+            
+            // Add a timestamp to prevent caching
+            const timestamp = now.getTime();
+            ctx.font = '1px Arial';
+            ctx.fillText(timestamp.toString(), 1, 1);
+        }
+        
+        // Draw date immediately
+        drawDate();
+        
+        // Update every 60 seconds
+        setInterval(drawDate, 60000);
+    </script>
+</body>
+</html>
