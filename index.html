@@ -1,19 +1,40 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta http-equiv="refresh" content="0;url=https://fakeimg.pl/300x60/ffffff/000000/?text=Wednesday,%20March%2026,%202025&font_size=20">
-    <title>Date Image Redirect</title>
+    <title>Date Image</title>
+    <style>
+        body, html { margin: 0; padding: 0; }
+        #dateCanvas { display: block; }
+    </style>
 </head>
 <body>
-    <p>Redirecting to today's date image...</p>
+    <canvas id="dateCanvas" width="300" height="60"></canvas>
     <script>
-        // Create date string in format "Wednesday, March 26, 2025"
-        const now = new Date();
-        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        const dateStr = encodeURIComponent(now.toLocaleDateString('en-US', options));
+        function renderDate() {
+            const canvas = document.getElementById('dateCanvas');
+            const ctx = canvas.getContext('2d');
+            const now = new Date();
+            const dateString = now.toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            // Clear canvas
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw date text
+            ctx.fillStyle = 'black';
+            ctx.font = '18px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(dateString, canvas.width/2, canvas.height/2);
+        }
         
-        // Redirect to fake image service with today's date
-        window.location.href = `https://fakeimg.pl/300x60/ffffff/000000/?text=${dateStr}&font_size=20`;
+        // Draw date immediately
+        renderDate();
     </script>
 </body>
 </html>
