@@ -13,40 +13,126 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     
-    - name: Install ImageMagick
+    - name: Install ImageMagick and download fonts
       run: |
         sudo apt-get update
-        sudo apt-get install -y imagemagick
+        sudo apt-get install -y imagemagick wget unzip
+        
+        # Create fonts directory
+        mkdir -p ~/.fonts
+        
+        # Download Open Sans
+        wget -O opensans.zip "https://fonts.google.com/download?family=Open%20Sans"
+        unzip -o opensans.zip -d ~/.fonts/opensans/
+        
+        # Download Inter
+        wget -O inter.zip "https://fonts.google.com/download?family=Inter"
+        unzip -o inter.zip -d ~/.fonts/inter/
+        
+        # Install Times New Roman alternative (Liberation Serif is very close)
+        sudo apt-get install -y fonts-liberation
+        
+        # Or if you want actual Times New Roman (needs EULA acceptance):
+        # echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | sudo debconf-set-selections
+        # sudo apt-get install -y ttf-mscorefonts-installer
+        
+        # Refresh font cache
+        fc-cache -fv
+        
+        # List available fonts for debugging
+        echo "Available fonts:"
+        fc-list : family | sort | uniq
     
-    - name: Generate date images
+    - name: Generate all date image variants
       run: |
         DATE=$(date +'%B %d, %Y')
         
-        # Small text - no whitespace
-        convert -background white -fill black \
-                -pointsize 16 \
-                label:"$DATE" \
-                -trim +repage \
-                date-small.png
-                
-        # Medium text - no whitespace
-        convert -background white -fill black \
-                -pointsize 24 \
-                label:"$DATE" \
-                -trim +repage \
-                date.png
-                
-        # Large text - no whitespace
-        convert -background white -fill black \
-                -pointsize 32 \
-                label:"$DATE" \
-                -trim +repage \
-                date-large.png
+        # Clean up old images
+        rm -f *.png
+        
+        # Define our options
+        # Note: Font names must match what fc-list shows
+        SIZES=(14 16 18 20 24 28 32)
+        COLORS=("black:000000" "white:FFFFFF" "gray:666666" "darkgray:333333" "red:CC0000" "blue:0066CC")
+        
+        # Generate for Open Sans
+        for size in "${SIZES[@]}"; do
+          for color_pair in "${COLORS[@]}"; do
+            color_name="${color_pair%%:*}"
+            color_hex="#${color_pair##*:}"
+            
+            # Open Sans Regular
+            convert -background transparent -fill "$color_hex" \
+                    -font "Open-Sans-Regular" \
+                    -pointsize "$size" \
+                    label:"$DATE" \
+                    -trim +repage \
+                    "font-opensans_size-${size}_weight-regular_color-${color_name}.png"
+            
+            # Open Sans Bold  
+            convert -background transparent -fill "$color_hex" \
+                    -font "Open-Sans-Bold" \
+                    -pointsize "$size" \
+                    label:"$DATE" \
+                    -trim +repage \
+                    "font-opensans_size-${size}_weight-bold_color-${color_name}.png"
+          done
+        done
+        
+        # Generate for Inter
+        for size in "${SIZES[@]}"; do
+          for color_pair in "${COLORS[@]}"; do
+            color_name="${color_pair%%:*}"
+            color_hex="#${color_pair##*:}"
+            
+            # Inter Regular
+            convert -background transparent -fill "$color_hex" \
+                    -font "Inter-Regular" \
+                    -pointsize "$size" \
+                    label:"$DATE" \
+                    -trim +repage \
+                    "font-inter_size-${size}_weight-regular_color-${color_name}.png"
+            
+            # Inter Bold
+            convert -background transparent -fill "$color_hex" \
+                    -font "Inter-Bold" \
+                    -pointsize "$size" \
+                    label:"$DATE" \
+                    -trim +repage \
+                    "font-inter_size-${size}_weight-bold_color-${color_name}.png"
+          done
+        done
+        
+        # Generate for Times (using Liberation Serif)
+        for size in "${SIZES[@]}"; do
+          for color_pair in "${COLORS[@]}"; do
+            color_name="${color_pair%%:*}"
+            color_hex="#${color_pair##*:}"
+            
+            # Times Regular
+            convert -background transparent -fill "$color_hex" \
+                    -font "Liberation-Serif" \
+                    -pointsize "$size" \
+                    label:"$DATE" \
+                    -trim +repage \
+                    "font-times_size-${size}_weight-regular_color-${color_name}.png"
+            
+            # Times Bold
+            convert -background transparent -fill "$color_hex" \
+                    -font "Liberation-Serif-Bold" \
+                    -pointsize "$size" \
+                    label:"$DATE" \
+                    -trim +repage \
+                    "font-times_size-${size}_weight-bold_color-${color_name}.png"
+          done
+        done
+        
+        echo "Generated $(ls -1 *.png | wc -l) date images"
     
     - name: Commit and push
       run: |
         git config user.name github-actions
         git config user.email github-actions@github.com
         git add *.png
-        git commit -m "Update date images" || exit 0
+        git commit -m "Update date images - $(date +'%Y-%m-%d')" || exit 0
         git push
