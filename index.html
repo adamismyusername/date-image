@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Date Image Selector</title>
+    <!-- Local Preline CSS - update path as needed -->
+    <link rel="stylesheet" href="preline-ui.css">
+    <style>
+        /* Custom styles for image container backgrounds */
+        .bg-opensans { background-color: rgb(191 219 254); } /* blue-200 */
+        .bg-inter { background-color: rgb(187 247 208); } /* green-200 */
+        .bg-times { background-color: rgb(254 215 170); } /* orange-200 */
+        
+        /* Toast notification styles */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #059669;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            display: none;
+            z-index: 9999;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        .toast.show {
+            display: block;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-neutral-900">
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">Copied to clipboard!</div>
+
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-gray-800 dark:text-white mb-8">Date Image Selector</h1>
+        
+        <!-- Filter Bar -->
+        <div class="bg-white dark:bg-neutral-800 p-6 rounded-xl shadow-sm mb-8">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Font Filter -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Font Family</label>
+                    <select id="fontFilter" class="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400">
+                        <option value="">All Fonts</option>
+                        <option value="opensans">Open Sans</option>
+                        <option value="inter">Inter</option>
+                        <option value="times">Times</option>
+                    </select>
+                </div>
+                
+                <!-- Size Filter -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Size</label>
+                    <select id="sizeFilter" class="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400">
+                        <option value="">All Sizes</option>
+                        <option value="14">14pt</option>
+                        <option value="16">16pt</option>
+                        <option value="18">18pt</option>
+                        <option value="20">20pt</option>
+                        <option value="24">24pt</option>
+                        <option value="28">28pt</option>
+                        <option value="32">32pt</option>
+                    </select>
+                </div>
+                
+                <!-- Weight Filter -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Weight</label>
+                    <select id="weightFilter" class="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400">
+                        <option value="">All Weights</option>
+                        <option value="regular">Regular</option>
+                        <option value="bold">Bold</option>
+                    </select>
+                </div>
+                
+                <!-- Color Filter -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Color</label>
+                    <select id="colorFilter" class="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400">
+                        <option value="">All Colors</option>
+                        <option value="black">Black</option>
+                        <option value="white">White</option>
+                        <option value="gray">Gray</option>
+                        <option value="darkgray">Dark Gray</option>
+                        <option value="red">Red</option>
+                        <option value="blue">Blue</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Cards Grid -->
+        <div id="cardsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
+            <!-- Cards will be generated here by JavaScript -->
+        </div>
+    </div>
+
+    <!-- Local Preline JS - update path as needed -->
+    <script src="preline-ui.js"></script>
+    
+    <script>
+        // Configuration
+        const BASE_URL = 'https://adamismyusername.github.io/date-image/';
+        const fonts = ['opensans', 'inter', 'times'];
+        const sizes = [14, 16, 18, 20, 24, 28, 32];
+        const weights = ['regular', 'bold'];
+        const colors = ['black', 'white', 'gray', 'darkgray', 'red', 'blue'];
+        
+        // Generate all image combinations
+        function generateImageData() {
+            const images = [];
+            fonts.forEach(font => {
+                sizes.forEach(size => {
+                    weights.forEach(weight => {
+                        colors.forEach(color => {
+                            images.push({
+                                font: font,
+                                size: size,
+                                weight: weight,
+                                color: color,
+                                filename: `font-${font}_size-${size}_weight-${weight}_color-${color}.png`,
+                                url: `${BASE_URL}font-${font}_size-${size}_weight-${weight}_color-${color}.png`
+                            });
+                        });
+                    });
+                });
+            });
+            return images;
+        }
+        
+        // Create a card element
+        function createCard(imageData) {
+            const card = document.createElement('div');
+            card.className = 'flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl dark:bg-neutral-900 dark:border-neutral-700 dark:shadow-neutral-700/70';
+            card.dataset.font = imageData.font;
+            card.dataset.size = imageData.size;
+            card.dataset.weight = imageData.weight;
+            card.dataset.color = imageData.color;
+            
+            // Determine background class based on font
+            const bgClass = `bg-${imageData.font}`;
+            
+            // Format display names
+            const fontDisplay = imageData.font === 'opensans' ? 'Open Sans' : 
+                               imageData.font === 'inter' ? 'Inter' : 'Times';
+            const weightDisplay = imageData.weight.charAt(0).toUpperCase() + imageData.weight.slice(1);
+            const colorDisplay = imageData.color === 'darkgray' ? 'Dark Gray' : 
+                                imageData.color.charAt(0).toUpperCase() + imageData.color.slice(1);
+            
+            card.innerHTML = `
+                <div class="${bgClass} rounded-t-xl p-8 flex items-center justify-center" style="height: 200px;">
+                    <img src="${imageData.url}" alt="Date in ${fontDisplay}" class="max-w-full max-h-full">
+                </div>
+                <div class="p-4 md:p-5">
+                    <h3 class="text-lg font-bold text-gray-800 dark:text-white">
+                        ${fontDisplay}
+                    </h3>
+                    <p class="mt-1 text-gray-500 dark:text-neutral-400">
+                        ${imageData.size}pt • ${weightDisplay} • ${colorDisplay}
+                    </p>
+                    <div class="mt-3 flex gap-2">
+                        <button onclick="copyURL('${imageData.url}')" 
+                                class="py-2 px-3 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800 dark:focus:bg-neutral-800">
+                            Copy URL
+                        </button>
+                        <button onclick="copyHTML('${imageData.url}')" 
+                                class="py-2 px-3 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700">
+                            Copy HTML
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            return card;
+        }
+        
+        // Copy URL to clipboard
+        function copyURL(url) {
+            navigator.clipboard.writeText(url).then(() => {
+                showToast('URL copied to clipboard!');
+            });
+        }
+        
+        // Copy HTML tag to clipboard
+        function copyHTML(url) {
+            const htmlTag = `<img src="${url}" alt="Current Date" style="display: block;">`;
+            navigator.clipboard.writeText(htmlTag).then(() => {
+                showToast('HTML tag copied to clipboard!');
+            });
+        }
+        
+        // Show toast notification
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+        
+        // Filter cards based on selected filters
+        function filterCards() {
+            const fontFilter = document.getElementById('fontFilter').value;
+            const sizeFilter = document.getElementById('sizeFilter').value;
+            const weightFilter = document.getElementById('weightFilter').value;
+            const colorFilter = document.getElementById('colorFilter').value;
+            
+            const cards = document.querySelectorAll('#cardsContainer > div');
+            
+            cards.forEach(card => {
+                const show = 
+                    (!fontFilter || card.dataset.font === fontFilter) &&
+                    (!sizeFilter || card.dataset.size === sizeFilter) &&
+                    (!weightFilter || card.dataset.weight === weightFilter) &&
+                    (!colorFilter || card.dataset.color === colorFilter);
+                
+                card.style.display = show ? 'flex' : 'none';
+            });
+        }
+        
+        // Initialize the page
+        function init() {
+            const container = document.getElementById('cardsContainer');
+            const images = generateImageData();
+            
+            // Create and append all cards
+            images.forEach(imageData => {
+                const card = createCard(imageData);
+                container.appendChild(card);
+            });
+            
+            // Add event listeners to filters
+            document.getElementById('fontFilter').addEventListener('change', filterCards);
+            document.getElementById('sizeFilter').addEventListener('change', filterCards);
+            document.getElementById('weightFilter').addEventListener('change', filterCards);
+            document.getElementById('colorFilter').addEventListener('change', filterCards);
+        }
+        
+        // Run when DOM is ready
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
