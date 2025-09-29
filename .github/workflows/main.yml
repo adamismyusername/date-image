@@ -22,25 +22,25 @@ jobs:
       run: |
         DATE=$(date +'%B %d, %Y')
         
-        convert -size 300x75 xc:white \
-                -pointsize 24 \
-                -gravity center \
-                -fill black \
-                -annotate +0+0 "$DATE" \
-                date.png
-                
-        convert -size 200x50 xc:white \
+        # Small text - no whitespace
+        convert -background white -fill black \
                 -pointsize 16 \
-                -gravity center \
-                -fill black \
-                -annotate +0+0 "$DATE" \
+                label:"$DATE" \
+                -trim +repage \
                 date-small.png
                 
-        convert -size 400x100 xc:white \
+        # Medium text - no whitespace
+        convert -background white -fill black \
+                -pointsize 24 \
+                label:"$DATE" \
+                -trim +repage \
+                date.png
+                
+        # Large text - no whitespace
+        convert -background white -fill black \
                 -pointsize 32 \
-                -gravity center \
-                -fill black \
-                -annotate +0+0 "$DATE" \
+                label:"$DATE" \
+                -trim +repage \
                 date-large.png
     
     - name: Commit and push
