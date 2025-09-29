@@ -119,8 +119,8 @@
       const colorDisplay=data.color==='darkgray'?'Dark Gray':data.color.charAt(0).toUpperCase()+data.color.slice(1);
 
       card.innerHTML=`
-        <div class="checkerboard rounded-t-xl p-4">
-          <div class="preview-box relative aspect-[16/5] min-h-[40px] w-full grid place-items-center overflow-visible">
+        <div class="checkerboard rounded-t-xl">
+          <div class="preview-box relative aspect-[16/5] w-full grid place-items-center overflow-visible">
             <img src="${data.url}" alt="${fontDisplay}" class="object-contain rounded-md transition-transform duration-200 group-hover:scale-[1.03]" />
           </div>
         </div>
