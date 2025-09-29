@@ -18,12 +18,27 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y imagemagick fonts-liberation
         
-        # Copy our fonts to where ImageMagick can find them
+        # Create fonts directory
         mkdir -p ~/.fonts
-        cp fonts/open-sans/*.ttf ~/.fonts/
-        cp fonts/inter/*.ttf ~/.fonts/
-        cp fonts/times/*.ttf ~/.fonts/ 2>/dev/null || true  # Times might be empty if using Liberation
+        
+        # Copy fonts - handle different structures
+        # Open Sans
+        find fonts/open-sans -name "*.ttf" -o -name "*.otf" | xargs -I {} cp {} ~/.fonts/ 2>/dev/null || true
+        
+        # Inter
+        find fonts/inter -name "*.ttf" -o -name "*.otf" | xargs -I {} cp {} ~/.fonts/ 2>/dev/null || true
+        
+        # Times (if you have actual Times fonts)
+        find fonts/times -name "*.ttf" -o -name "*.otf" | xargs -I {} cp {} ~/.fonts/ 2>/dev/null || true
+        
+        # Refresh font cache
         fc-cache -fv
+        
+        # Debug: Show what fonts we actually have
+        echo "=== Font files copied ==="
+        ls -la ~/.fonts/
+        echo "=== Available fonts in system ==="
+        fc-list : family | sort | uniq
     
     - name: Generate all date image variants
       run: |
@@ -45,17 +60,41 @@ jobs:
             color_name="${color_pair%%:*}"
             color_hex="#${color_pair##*:}"
             
-            # Regular
+            # Regular - try multiple possible font names
+            convert -background transparent -fill "$color_hex" \
+                    -font "Open-Sans-Regular" \
+                    -pointsize "$size" \
+                    label:"$DATE" \
+                    -trim +repage \
+                    "images/font-opensans_size-${size}_weight-regular_color-${color_name}.png" 2>/dev/null || \
             convert -background transparent -fill "$color_hex" \
                     -font "OpenSans-Regular" \
                     -pointsize "$size" \
                     label:"$DATE" \
                     -trim +repage \
+                    "images/font-opensans_size-${size}_weight-regular_color-${color_name}.png" 2>/dev/null || \
+            convert -background transparent -fill "$color_hex" \
+                    -font "Open-Sans" \
+                    -pointsize "$size" \
+                    label:"$DATE" \
+                    -trim +repage \
                     "images/font-opensans_size-${size}_weight-regular_color-${color_name}.png"
             
-            # Bold  
+            # Bold
+            convert -background transparent -fill "$color_hex" \
+                    -font "Open-Sans-Bold" \
+                    -pointsize "$size" \
+                    label:"$DATE" \
+                    -trim +repage \
+                    "images/font-opensans_size-${size}_weight-bold_color-${color_name}.png" 2>/dev/null || \
             convert -background transparent -fill "$color_hex" \
                     -font "OpenSans-Bold" \
+                    -pointsize "$size" \
+                    label:"$DATE" \
+                    -trim +repage \
+                    "images/font-opensans_size-${size}_weight-bold_color-${color_name}.png" 2>/dev/null || \
+            convert -background transparent -fill "$color_hex" \
+                    -font "Open-Sans-SemiBold" \
                     -pointsize "$size" \
                     label:"$DATE" \
                     -trim +repage \
@@ -75,6 +114,12 @@ jobs:
                     -pointsize "$size" \
                     label:"$DATE" \
                     -trim +repage \
+                    "images/font-inter_size-${size}_weight-regular_color-${color_name}.png" 2>/dev/null || \
+            convert -background transparent -fill "$color_hex" \
+                    -font "Inter" \
+                    -pointsize "$size" \
+                    label:"$DATE" \
+                    -trim +repage \
                     "images/font-inter_size-${size}_weight-regular_color-${color_name}.png"
             
             # Bold
@@ -83,11 +128,17 @@ jobs:
                     -pointsize "$size" \
                     label:"$DATE" \
                     -trim +repage \
+                    "images/font-inter_size-${size}_weight-bold_color-${color_name}.png" 2>/dev/null || \
+            convert -background transparent -fill "$color_hex" \
+                    -font "Inter-SemiBold" \
+                    -pointsize "$size" \
+                    label:"$DATE" \
+                    -trim +repage \
                     "images/font-inter_size-${size}_weight-bold_color-${color_name}.png"
           done
         done
         
-        # Generate for Times (using Liberation Serif or actual Times fonts)
+        # Generate for Times (using Liberation Serif)
         for size in "${SIZES[@]}"; do
           for color_pair in "${COLORS[@]}"; do
             color_name="${color_pair%%:*}"
