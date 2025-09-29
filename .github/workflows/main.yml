@@ -20,15 +20,20 @@ jobs:
         
         # Copy our fonts to where ImageMagick can find them
         mkdir -p ~/.fonts
-        cp fonts/*.ttf ~/.fonts/
+        cp fonts/open-sans/*.ttf ~/.fonts/
+        cp fonts/inter/*.ttf ~/.fonts/
+        cp fonts/times/*.ttf ~/.fonts/ 2>/dev/null || true  # Times might be empty if using Liberation
         fc-cache -fv
     
     - name: Generate all date image variants
       run: |
         DATE=$(date +'%B %d, %Y')
         
+        # Create images directory if it doesn't exist
+        mkdir -p images
+        
         # Clean up old images
-        rm -f *.png
+        rm -f images/*.png
         
         # Define our options
         SIZES=(14 16 18 20 24 28 32)
@@ -46,7 +51,7 @@ jobs:
                     -pointsize "$size" \
                     label:"$DATE" \
                     -trim +repage \
-                    "font-opensans_size-${size}_weight-regular_color-${color_name}.png"
+                    "images/font-opensans_size-${size}_weight-regular_color-${color_name}.png"
             
             # Bold  
             convert -background transparent -fill "$color_hex" \
@@ -54,7 +59,7 @@ jobs:
                     -pointsize "$size" \
                     label:"$DATE" \
                     -trim +repage \
-                    "font-opensans_size-${size}_weight-bold_color-${color_name}.png"
+                    "images/font-opensans_size-${size}_weight-bold_color-${color_name}.png"
           done
         done
         
@@ -70,7 +75,7 @@ jobs:
                     -pointsize "$size" \
                     label:"$DATE" \
                     -trim +repage \
-                    "font-inter_size-${size}_weight-regular_color-${color_name}.png"
+                    "images/font-inter_size-${size}_weight-regular_color-${color_name}.png"
             
             # Bold
             convert -background transparent -fill "$color_hex" \
@@ -78,11 +83,11 @@ jobs:
                     -pointsize "$size" \
                     label:"$DATE" \
                     -trim +repage \
-                    "font-inter_size-${size}_weight-bold_color-${color_name}.png"
+                    "images/font-inter_size-${size}_weight-bold_color-${color_name}.png"
           done
         done
         
-        # Generate for Times (using Liberation Serif)
+        # Generate for Times (using Liberation Serif or actual Times fonts)
         for size in "${SIZES[@]}"; do
           for color_pair in "${COLORS[@]}"; do
             color_name="${color_pair%%:*}"
@@ -94,7 +99,7 @@ jobs:
                     -pointsize "$size" \
                     label:"$DATE" \
                     -trim +repage \
-                    "font-times_size-${size}_weight-regular_color-${color_name}.png"
+                    "images/font-times_size-${size}_weight-regular_color-${color_name}.png"
             
             # Bold
             convert -background transparent -fill "$color_hex" \
@@ -102,16 +107,16 @@ jobs:
                     -pointsize "$size" \
                     label:"$DATE" \
                     -trim +repage \
-                    "font-times_size-${size}_weight-bold_color-${color_name}.png"
+                    "images/font-times_size-${size}_weight-bold_color-${color_name}.png"
           done
         done
         
-        echo "Generated $(ls -1 *.png | wc -l) date images"
+        echo "Generated $(ls -1 images/*.png | wc -l) date images"
     
     - name: Commit and push
       run: |
         git config user.name github-actions
         git config user.email github-actions@github.com
-        git add *.png
+        git add images/*.png
         git commit -m "Update date images - $(date +'%Y-%m-%d')" || exit 0
         git push
