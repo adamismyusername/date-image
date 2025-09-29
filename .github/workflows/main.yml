@@ -1,8 +1,8 @@
 name: Update Date Images
 on:
   schedule:
-    - cron: '0 0 * * *'  # Runs at midnight UTC
-  workflow_dispatch:      # Lets you run it manually for testing
+    - cron: '0 0 * * *'
+  workflow_dispatch:
 
 jobs:
   update-dates:
@@ -10,11 +10,15 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     
+    - name: Install ImageMagick
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y imagemagick
+    
     - name: Generate date images
       run: |
         DATE=$(date +'%B %d, %Y')
         
-        # Create images using ImageMagick (pre-installed on Ubuntu)
         convert -size 300x75 xc:white \
                 -pointsize 24 \
                 -gravity center \
