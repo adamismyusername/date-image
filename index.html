@@ -7,9 +7,6 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     .toast {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
       background: #059669;
       color: white;
       padding: 12px 20px;
@@ -26,7 +23,6 @@
   </style>
 </head>
 <body class="bg-slate-50">
-  <div id="toast" class="toast">Copied to clipboard!</div>
 
   <div class="min-h-screen py-8">
     <div class="max-w-6xl mx-auto px-4">
@@ -122,6 +118,7 @@
             <button onclick="copyCurrentURL()" class="px-6 py-4 bg-white hover:bg-teal-600 text-slate-400 hover:text-slate-100 rounded-lg border border-slate-400 hover:border-teal-300 transition">Copy URL</button>
             <button onclick="copyCurrentHTML()" class="px-6 py-4 bg-white hover:bg-blue-700 text-slate-400 hover:text-slate-100 rounded-lg border border-slate-400 hover:border-blue-300 transition">Copy URL w/ IMG Tag</button>
           </div>
+          <div id="toast" class="toast">Copied to clipboard!</div>
         </div>
       
     </div>
