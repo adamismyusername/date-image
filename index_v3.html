@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Date Image Editor</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #059669;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      display: none;
+      z-index: 9999;
+      animation: slideIn 0.3s ease;
+    }
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    .toast.show { display: block; }
+  </style>
+</head>
+<body class="bg-gray-100">
+  <div id="toast" class="toast">Copied to clipboard!</div>
+
+  <div class="min-h-screen py-8">
+    <div class="max-w-6xl mx-auto px-4">
+      <!-- Title -->
+      <h1 class="text-3xl font-bold text-gray-800 text-center mb-8">Date Image Editor</h1>
+      
+      <!-- Preview Area -->
+      <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+        <div class="grid grid-cols-3 gap-4">
+          <!-- White Background Preview -->
+          <div class="border border-gray-200 rounded-lg overflow-hidden">
+            <div class="bg-gray-100 px-3 py-2 text-sm text-gray-600 border-b">White Background</div>
+            <div id="preview1" class="aspect-square flex items-center justify-center p-8" style="background-color: #FFFFFF;">
+              <img id="previewImg1" src="" alt="Date Preview" class="max-w-full max-h-full object-contain">
+            </div>
+          </div>
+          
+          <!-- Black Background Preview -->
+          <div class="border border-gray-200 rounded-lg overflow-hidden">
+            <div class="bg-gray-100 px-3 py-2 text-sm text-gray-600 border-b">Black Background</div>
+            <div id="preview2" class="aspect-square flex items-center justify-center p-8" style="background-color: #000000;">
+              <img id="previewImg2" src="" alt="Date Preview" class="max-w-full max-h-full object-contain">
+            </div>
+          </div>
+          
+          <!-- Gray Background Preview -->
+          <div class="border border-gray-200 rounded-lg overflow-hidden">
+            <div class="bg-gray-100 px-3 py-2 text-sm text-gray-600 border-b">Gray Background</div>
+            <div id="preview3" class="aspect-square flex items-center justify-center p-8" style="background-color: #999999;">
+              <img id="previewImg3" src="" alt="Date Preview" class="max-w-full max-h-full object-contain">
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Editor Bar -->
+      <div class="bg-white rounded-lg shadow-lg p-6">
+        <h2 class="text-lg font-semibold text-gray-700 mb-4">Image Settings</h2>
+        
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Font</label>
+            <select id="fontSelector" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              <option value="opensans">Open Sans</option>
+              <option value="inter">Inter</option>
+              <option value="times">Times</option>
+            </select>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Size</label>
+            <select id="sizeSelector" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              <option value="14">14pt</option>
+              <option value="16">16pt</option>
+              <option value="18">18pt</option>
+              <option value="20">20pt</option>
+              <option value="24">24pt</option>
+              <option value="28">28pt</option>
+              <option value="32">32pt</option>
+            </select>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Weight</label>
+            <select id="weightSelector" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              <option value="regular">Regular</option>
+              <option value="bold">Bold</option>
+            </select>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Color</label>
+            <select id="colorSelector" class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              <option value="black">Black</option>
+              <option value="white">White</option>
+              <option value="gray">Gray</option>
+              <option value="darkgray">Dark Gray</option>
+              <option value="red">Red</option>
+              <option value="blue">Blue</option>
+            </select>
+          </div>
+        </div>
+        
+        <!-- Current Image Info -->
+        <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+          <p id="imageInfo" class="text-sm text-gray-600 mb-3"></p>
+          <div class="flex gap-3">
+            <button onclick="copyCurrentURL()" class="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition">
+              Copy Image URL
+            </button>
+            <button onclick="copyCurrentHTML()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+              Copy HTML Tag
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const BASE_URL = 'https://adamismyusername.github.io/date-image/images/';
+    let currentImageURL = '';
+
+    function updateImage() {
+      const font = document.getElementById('fontSelector').value;
+      const size = document.getElementById('sizeSelector').value;
+      const weight = document.getElementById('weightSelector').value;
+      const color = document.getElementById('colorSelector').value;
+      
+      const filename = `font-${font}_size-${size}_weight-${weight}_color-${color}.png`;
+      currentImageURL = `${BASE_URL}${filename}`;
+      
+      // Update all three preview images
+      document.getElementById('previewImg1').src = currentImageURL;
+      document.getElementById('previewImg2').src = currentImageURL;
+      document.getElementById('previewImg3').src = currentImageURL;
+      
+      // Update info text
+      const fontDisplay = font === 'opensans' ? 'Open Sans' : font === 'inter' ? 'Inter' : 'Times';
+      const weightDisplay = weight.charAt(0).toUpperCase() + weight.slice(1);
+      const colorDisplay = color === 'darkgray' ? 'Dark Gray' : color.charAt(0).toUpperCase() + color.slice(1);
+      
+      document.getElementById('imageInfo').textContent = 
+        `Current: ${fontDisplay} • ${size}pt • ${weightDisplay} • ${colorDisplay}`;
+    }
+
+    function copyCurrentURL() {
+      navigator.clipboard.writeText(currentImageURL).then(() => {
+        showToast('URL copied to clipboard!');
+      });
+    }
+
+    function copyCurrentHTML() {
+      const tag = `<img src="${currentImageURL}" alt="Current Date" style="display:block;">`;
+      navigator.clipboard.writeText(tag).then(() => {
+        showToast('HTML tag copied to clipboard!');
+      });
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      // Add event listeners to all selectors
+      ['fontSelector', 'sizeSelector', 'weightSelector', 'colorSelector'].forEach(id => {
+        document.getElementById(id).addEventListener('change', updateImage);
+      });
+      
+      // Load initial image
+      updateImage();
+    });
+  </script>
+</body>
+</html>
