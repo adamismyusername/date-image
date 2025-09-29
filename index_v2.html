@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Date Image Selector</title>
+  <link rel="stylesheet" href="preline-ui.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .checkerboard {
+      background-image:
+        repeating-linear-gradient(45deg, rgba(0,0,0,0.06) 0 10px, transparent 10px 20px),
+        repeating-linear-gradient(135deg, rgba(0,0,0,0.06) 0 10px, transparent 10px 20px);
+    }
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #059669;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      display: none;
+      z-index: 9999;
+      animation: slideIn 0.3s ease;
+    }
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    .toast.show { display: block; }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <div id="toast" class="toast">Copied to clipboard!</div>
+
+  <!-- Header -->
+  <header class="sticky top-0 z-10 bg-white/90 backdrop-blur border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-4 py-4">
+      <h1 class="text-2xl font-bold text-gray-800">Date Image Selector</h1>
+      <!-- Filter Bar -->
+      <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
+        <select id="fontFilter" class="px-3 py-2 rounded-lg border border-gray-300 text-sm">
+          <option value="">All Fonts</option>
+          <option value="opensans">Open Sans</option>
+          <option value="inter">Inter</option>
+          <option value="times">Times</option>
+        </select>
+        <select id="sizeFilter" class="px-3 py-2 rounded-lg border border-gray-300 text-sm">
+          <option value="">All Sizes</option>
+          <option value="14">14pt</option>
+          <option value="16">16pt</option>
+          <option value="18">18pt</option>
+          <option value="20">20pt</option>
+          <option value="24">24pt</option>
+          <option value="28">28pt</option>
+          <option value="32">32pt</option>
+        </select>
+        <select id="weightFilter" class="px-3 py-2 rounded-lg border border-gray-300 text-sm">
+          <option value="">All Weights</option>
+          <option value="regular">Regular</option>
+          <option value="bold">Bold</option>
+        </select>
+        <select id="colorFilter" class="px-3 py-2 rounded-lg border border-gray-300 text-sm">
+          <option value="">All Colors</option>
+          <option value="black">Black</option>
+          <option value="white">White</option>
+          <option value="gray">Gray</option>
+          <option value="darkgray">Dark Gray</option>
+          <option value="red">Red</option>
+          <option value="blue">Blue</option>
+        </select>
+        <input id="searchInput" type="text" placeholder="Search specs…" class="px-3 py-2 rounded-lg border border-gray-300 text-sm col-span-2"/>
+      </div>
+    </div>
+  </header>
+
+  <!-- Cards -->
+  <main class="max-w-7xl mx-auto px-4 py-6">
+    <div id="cardsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
+  </main>
+
+  <script src="preline-ui.js"></script>
+  <script>
+    const BASE_URL = 'https://adamismyusername.github.io/date-image/images/';
+    const fonts = ['opensans', 'inter', 'times'];
+    const sizes = [14,16,18,20,24,28,32];
+    const weights = ['regular','bold'];
+    const colors = ['black','white','gray','darkgray','red','blue'];
+
+    function generateImageData(){
+      const images=[];
+      fonts.forEach(font=>{
+        sizes.forEach(size=>{
+          weights.forEach(weight=>{
+            colors.forEach(color=>{
+              images.push({
+                font,size,weight,color,
+                filename:`font-${font}_size-${size}_weight-${weight}_color-${color}.png`,
+                url:`${BASE_URL}font-${font}_size-${size}_weight-${weight}_color-${color}.png`
+              });
+            });
+          });
+        });
+      });
+      return images;
+    }
+
+    function createCard(data){
+      const card=document.createElement('div');
+      card.className='group flex flex-col bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition';
+      card.dataset.font=data.font;
+      card.dataset.size=data.size;
+      card.dataset.weight=data.weight;
+      card.dataset.color=data.color;
+
+      const fontDisplay=data.font==='opensans'?'Open Sans':data.font==='inter'?'Inter':'Times';
+      const weightDisplay=data.weight.charAt(0).toUpperCase()+data.weight.slice(1);
+      const colorDisplay=data.color==='darkgray'?'Dark Gray':data.color.charAt(0).toUpperCase()+data.color.slice(1);
+
+      card.innerHTML=`
+        <div class="checkerboard rounded-t-xl p-6 flex items-center justify-center">
+          <img src="${data.url}" alt="${fontDisplay}" class="max-w-full max-h-24 rounded-lg shadow-sm group-hover:scale-105 transition-transform">
+        </div>
+        <div class="p-4 flex flex-col gap-2">
+          <p class="text-sm text-gray-600">${fontDisplay} • ${data.size}pt • ${weightDisplay} • ${colorDisplay}</p>
+          <div class="flex gap-2">
+            <button onclick="copyURL('${data.url}')" class="px-3 py-2 rounded-lg bg-gray-100 text-sm text-gray-800 hover:bg-gray-200">Copy URL</button>
+            <button onclick="copyHTML('${data.url}')" class="px-3 py-2 rounded-lg bg-blue-600 text-sm text-white hover:bg-blue-700">Copy HTML</button>
+          </div>
+        </div>`;
+
+      return card;
+    }
+
+    function copyURL(url){
+      navigator.clipboard.writeText(url).then(()=>showToast('URL copied to clipboard!'));
+    }
+    function copyHTML(url){
+      const tag=`<img src="${url}" alt="Current Date" style="display:block;">`;
+      navigator.clipboard.writeText(tag).then(()=>showToast('HTML copied to clipboard!'));
+    }
+    function showToast(msg){
+      const toast=document.getElementById('toast');
+      toast.textContent=msg; toast.classList.add('show');
+      setTimeout(()=>toast.classList.remove('show'),2000);
+    }
+
+    function filterCards(){
+      const font=document.getElementById('fontFilter').value;
+      const size=document.getElementById('sizeFilter').value;
+      const weight=document.getElementById('weightFilter').value;
+      const color=document.getElementById('colorFilter').value;
+      const q=document.getElementById('searchInput').value.toLowerCase();
+      document.querySelectorAll('#cardsContainer>div').forEach(card=>{
+        const match=( !font||card.dataset.font===font ) &&
+                    ( !size||card.dataset.size===size ) &&
+                    ( !weight||card.dataset.weight===weight ) &&
+                    ( !color||card.dataset.color===color ) &&
+                    ( !q|| `${card.dataset.font} ${card.dataset.size} ${card.dataset.weight} ${card.dataset.color}`.toLowerCase().includes(q));
+        card.style.display=match?'flex':'none';
+      });
+    }
+
+    function init(){
+      const container=document.getElementById('cardsContainer');
+      generateImageData().forEach(img=>container.appendChild(createCard(img)));
+      ['fontFilter','sizeFilter','weightFilter','colorFilter','searchInput'].forEach(id=>{
+        document.getElementById(id).addEventListener('input',filterCards);
+      });
+    }
+    document.addEventListener('DOMContentLoaded',init);
+  </script>
+</body>
+</html>
