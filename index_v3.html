@@ -161,7 +161,7 @@
     }
 
     function copyCurrentHTML() {
-      const tag = `<img src="${currentImageURL}" alt="Current Date" style="display:block;">`;
+      const tag = `<img src="${currentImageURL}" alt="Current Date" >`;
       navigator.clipboard.writeText(tag).then(() => {
         showToast('HTML tag copied to clipboard!');
       });
