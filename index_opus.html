@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DateImage Pro - Always-Current Date Images for Your Website</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Custom styles for toast notifications */
+    .toast {
+      background: linear-gradient(135deg, #14b8a6 0%, #0891b2 100%);
+      color: white;
+      padding: 16px 24px;
+      border-radius: 12px;
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      display: none;
+      z-index: 9999;
+      animation: slideIn 0.3s ease;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+    @keyframes slideIn {
+      from { transform: translateX(400px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    .toast.show { display: block; }
+
+    /* FAQ Accordion Styles */
+    .faq-item {
+      transition: all 0.3s ease;
+    }
+    .faq-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+    .faq-content.open {
+      max-height: 500px;
+    }
+    .faq-icon {
+      transition: transform 0.3s ease;
+    }
+    .faq-icon.rotate {
+      transform: rotate(180deg);
+    }
+
+    /* Mobile menu animation */
+    .mobile-menu {
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+    }
+    .mobile-menu.active {
+      transform: translateX(0);
+    }
+
+    /* Gradient text effect */
+    .gradient-text {
+      background: linear-gradient(135deg, #14b8a6 0%, #0891b2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Hero background pattern */
+    .hero-pattern {
+      background-color: #f8fafc;
+      background-image:
+        linear-gradient(30deg, #f1f5f9 12%, transparent 12.5%, transparent 87%, #f1f5f9 87.5%, #f1f5f9),
+        linear-gradient(150deg, #f1f5f9 12%, transparent 12.5%, transparent 87%, #f1f5f9 87.5%, #f1f5f9),
+        linear-gradient(30deg, #f1f5f9 12%, transparent 12.5%, transparent 87%, #f1f5f9 87.5%, #f1f5f9),
+        linear-gradient(150deg, #f1f5f9 12%, transparent 12.5%, transparent 87%, #f1f5f9 87.5%, #f1f5f9);
+      background-size: 40px 70px;
+      background-position: 0 0, 0 0, 20px 35px, 20px 35px;
+    }
+
+    /* Hover effects */
+    .hover-lift {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .hover-lift:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    }
+  </style>
+</head>
+<body class="bg-slate-50">
+
+  <!-- Header Navigation -->
+  <header class="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-sm shadow-sm z-50">
+    <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <!-- Logo -->
+        <div class="flex items-center">
+          <span class="text-xl font-bold gradient-text">DateImage Pro</span>
+        </div>
+
+        <!-- Desktop Navigation -->
+        <div class="hidden md:flex items-center space-x-8">
+          <a href="#home" class="text-slate-600 hover:text-teal-600 transition">Home</a>
+          <a href="#tool" class="text-slate-600 hover:text-teal-600 transition">Generator</a>
+          <a href="#how-to" class="text-slate-600 hover:text-teal-600 transition">How To Use</a>
+          <a href="#faq" class="text-slate-600 hover:text-teal-600 transition">FAQ</a>
+          <a href="#tool" class="px-4 py-2 bg-gradient-to-r from-teal-500 to-cyan-600 text-white rounded-lg hover:from-teal-600 hover:to-cyan-700 transition">Try Now</a>
+        </div>
+
+        <!-- Mobile Menu Button -->
+        <button id="mobileMenuBtn" class="md:hidden p-2">
+          <svg class="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="mobile-menu fixed top-0 right-0 h-full w-64 bg-white shadow-xl md:hidden">
+      <div class="p-6">
+        <button id="closeMobileMenu" class="absolute top-4 right-4 p-2">
+          <svg class="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+        <div class="mt-8 flex flex-col space-y-4">
+          <a href="#home" class="text-slate-600 hover:text-teal-600 transition py-2">Home</a>
+          <a href="#tool" class="text-slate-600 hover:text-teal-600 transition py-2">Generator</a>
+          <a href="#how-to" class="text-slate-600 hover:text-teal-600 transition py-2">How To Use</a>
+          <a href="#faq" class="text-slate-600 hover:text-teal-600 transition py-2">FAQ</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section id="home" class="hero-pattern pt-24 pb-16 md:pt-32 md:pb-24">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h1 class="text-4xl md:text-6xl font-bold text-slate-800 mb-6">
+        Always-Current <span class="gradient-text">Date Images</span> for Emails
+      </h1>
+      <p class="text-2xl md:text-2xl text-slate-600 max-w-3xl mx-auto mb-8">
+        Generate professional date images that automatically update daily.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="#tool" class="px-8 py-4 bg-gradient-to-r from-teal-500 to-cyan-600 text-white rounded-lg text-lg font-semibold hover:from-teal-600 hover:to-cyan-700 transition transform hover:scale-105">
+          Generate Your Date Image
+        </a>
+        <a href="#how-to" class="px-8 py-4 bg-white text-slate-700 border-2 border-slate-300 rounded-lg text-lg font-semibold hover:border-teal-500 hover:text-teal-600 transition">
+          See How It Works
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tool Section -->
+  <section id="tool" class="py-16 bg-white">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold text-slate-800 mb-4">Date Image Generator</h2>
+        <p class="text-lg text-slate-600">Customize your date image with different fonts, sizes, weights, and colors</p>
+      </div>
+
+      <!-- Preview Area -->
+      <div class="bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl p-6 md:p-8 mb-8 hover-lift">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+
+          <!-- White Background Preview -->
+          <div class="rounded-xl border-2 border-slate-200 overflow-hidden">
+            <div class="bg-slate-600 text-white text-xs font-medium py-1 px-3 text-center">White Background</div>
+            <div id="preview1" class="flex items-center justify-center min-h-[120px] p-4" style="background-color: #FFFFFF;">
+              <img id="previewImg1" src="" alt="Date Preview" class="max-w-full max-h-full object-contain">
+            </div>
+          </div>
+
+          <!-- Gray Background Preview -->
+          <div class="rounded-xl overflow-hidden border-2 border-slate-200">
+            <div class="bg-slate-600 text-white text-xs font-medium py-1 px-3 text-center">Gray Background</div>
+            <div id="preview3" class="flex items-center justify-center min-h-[120px] p-4" style="background-color: #999999;">
+              <img id="previewImg3" src="" alt="Date Preview" class="max-w-full max-h-full object-contain">
+            </div>
+          </div>
+
+          <!-- Black Background Preview -->
+          <div class="rounded-xl overflow-hidden border-2 border-slate-200">
+            <div class="bg-slate-600 text-white text-xs font-medium py-1 px-3 text-center">Black Background</div>
+            <div id="preview2" class="flex items-center justify-center min-h-[120px] p-4" style="background-color: #000000;">
+              <img id="previewImg2" src="" alt="Date Preview" class="max-w-full max-h-full object-contain">
+            </div>
+          </div>
+        </div>
+
+        <p id="imageInfo" class="text-sm text-slate-500 text-center mb-6">Loading...</p>
+
+        <!-- Style Controls -->
+        <div class="bg-white rounded-xl p-6 shadow-sm">
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-2">Font</label>
+              <select id="fontSelector" class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-white">
+                <option value="opensans">Open Sans</option>
+                <option value="inter">Inter</option>
+                <option value="times">Times</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-2">Size</label>
+              <select id="sizeSelector" class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-white">
+                <option value="14">14pt</option>
+                <option value="16">16pt</option>
+                <option value="18">18pt</option>
+                <option value="20">20pt</option>
+                <option value="24">24pt</option>
+                <option value="28">28pt</option>
+                <option value="32">32pt</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-2">Weight</label>
+              <select id="weightSelector" class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-white">
+                <option value="regular">Regular</option>
+                <option value="bold">Bold</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-2">Color</label>
+              <select id="colorSelector" class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-white">
+                <option value="black">Black</option>
+                <option value="white">White</option>
+                <option value="gray">Gray</option>
+                <option value="darkgray">Dark Gray</option>
+                <option value="red">Red</option>
+                <option value="blue">Blue</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Copy Buttons -->
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <button onclick="copyCurrentURL()" class="px-8 py-3 bg-gradient-to-r from-teal-500 to-cyan-600 text-white rounded-lg font-semibold hover:from-teal-600 hover:to-cyan-700 transition transform hover:scale-105 flex items-center justify-center">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+          </svg>
+          Copy Image URL
+        </button>
+        <button onclick="copyCurrentHTML()" class="px-8 py-3 bg-white text-slate-700 border-2 border-slate-300 rounded-lg font-semibold hover:border-teal-500 hover:text-teal-600 transition transform hover:scale-105 flex items-center justify-center">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+          </svg>
+          Copy HTML Code
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- How To Use Section -->
+  <section id="how-to" class="py-16 bg-slate-50">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold text-slate-800 mb-4">How To Use</h2>
+        <p class="text-lg text-slate-600">Get your date image up and running in 3 simple steps</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Step 1 -->
+        <div class="bg-white rounded-xl p-8 text-center hover-lift">
+          <div class="w-16 h-16 bg-gradient-to-r from-teal-500 to-cyan-600 rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">1</div>
+          <svg class="w-12 h-12 text-teal-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
+          </svg>
+          <h3 class="text-xl font-semibold text-slate-800 mb-2">Choose Your Style</h3>
+          <p class="text-slate-600">Select from different fonts, sizes, weights, and colors to match your website's design</p>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="bg-white rounded-xl p-8 text-center hover-lift">
+          <div class="w-16 h-16 bg-gradient-to-r from-teal-500 to-cyan-600 rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">2</div>
+          <svg class="w-12 h-12 text-teal-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+          </svg>
+          <h3 class="text-xl font-semibold text-slate-800 mb-2">Preview on Backgrounds</h3>
+          <p class="text-slate-600">See how your date image looks on different colored backgrounds instantly</p>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="bg-white rounded-xl p-8 text-center hover-lift">
+          <div class="w-16 h-16 bg-gradient-to-r from-teal-500 to-cyan-600 rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">3</div>
+          <svg class="w-12 h-12 text-teal-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+          </svg>
+          <h3 class="text-xl font-semibold text-slate-800 mb-2">Copy URL or HTML</h3>
+          <p class="text-slate-600">Get the direct image URL or ready-to-paste HTML code for your website</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section id="faq" class="py-16 bg-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold text-slate-800 mb-4">Frequently Asked Questions</h2>
+        <p class="text-lg text-slate-600">Everything you need to know about DateImage Pro</p>
+      </div>
+
+      <div class="space-y-4">
+        <!-- FAQ Item 1 -->
+        <div class="faq-item bg-slate-50 rounded-lg">
+          <button class="faq-trigger w-full px-6 py-4 text-left flex items-center justify-between hover:bg-slate-100 transition rounded-lg">
+            <span class="font-semibold text-slate-800">When do the date images update?</span>
+            <svg class="faq-icon w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+          <div class="faq-content px-6">
+            <p class="text-slate-600 pb-4">The date images automatically update daily at midnight UTC. Your embedded images will always show the current date without any manual intervention required. The update process is handled by our automated GitHub Actions workflow.</p>
+          </div>
+        </div>
+
+        <!-- FAQ Item 2 -->
+        <div class="faq-item bg-slate-50 rounded-lg">
+          <button class="faq-trigger w-full px-6 py-4 text-left flex items-center justify-between hover:bg-slate-100 transition rounded-lg">
+            <span class="font-semibold text-slate-800">What image formats are available?</span>
+            <svg class="faq-icon w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+          <div class="faq-content px-6">
+            <p class="text-slate-600 pb-4">Currently, all date images are provided in PNG format. PNG offers the best quality for text rendering and supports transparency, making it perfect for overlaying on different backgrounds. The images are optimized for web use to ensure fast loading times.</p>
+          </div>
+        </div>
+
+        <!-- FAQ Item 3 -->
+        <div class="faq-item bg-slate-50 rounded-lg">
+          <button class="faq-trigger w-full px-6 py-4 text-left flex items-center justify-between hover:bg-slate-100 transition rounded-lg">
+            <span class="font-semibold text-slate-800">What do I do if I need a different font, color, or size?</span>
+            <svg class="faq-icon w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+          <div class="faq-content px-6">
+            <p class="text-slate-600 pb-4">Reach out to Adam G with the specific requirements for your desired font, color, or size. He'll be able to assist you in generating a custom image that meets your needs.</p>
+          </div>
+        </div>
+
+        <!-- FAQ Item 4 -->
+        <div class="faq-item bg-slate-50 rounded-lg">
+          <button class="faq-trigger w-full px-6 py-4 text-left flex items-center justify-between hover:bg-slate-100 transition rounded-lg">
+            <span class="font-semibold text-slate-800">How do I add the date image to my website?</span>
+            <svg class="faq-icon w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+          <div class="faq-content px-6">
+            <p class="text-slate-600 pb-4">Simply use the "Copy HTML Code" button to get a ready-to-paste HTML img tag, or copy the direct URL and use it in your existing img tags. The image will automatically update daily. You can also use it in CSS as a background image or in any platform that accepts image URLs.</p>
+          </div>
+        </div>
+
+        <!-- FAQ Item 5 -->
+        <div class="faq-item bg-slate-50 rounded-lg">
+          <button class="faq-trigger w-full px-6 py-4 text-left flex items-center justify-between hover:bg-slate-100 transition rounded-lg">
+            <span class="font-semibold text-slate-800">Why use date images instead of text?</span>
+            <svg class="faq-icon w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+          <div class="faq-content px-6">
+            <p class="text-slate-600 pb-4">Date images provide consistent rendering across all platforms and browsers, eliminating font compatibility issues. They're perfect for email signatures, newsletters, and platforms with limited CSS support. Plus, they automatically update without requiring any server-side code or JavaScript.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-slate-800 text-white py-8">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <p class="text-slate-400">© 2024 DateImage Pro. Auto-updating date images for the modern web.</p>
+      <p class="text-slate-500 text-sm mt-2">Powered by GitHub Pages and ImageMagick</p>
+    </div>
+  </footer>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast">Copied to clipboard!</div>
+
+  <!-- JavaScript -->
+  <script>
+    // Image generation logic from original
+    const BASE_URL = 'https://adamismyusername.github.io/date-image/images/';
+    let currentImageURL = '';
+
+    function updateImage() {
+      const font = document.getElementById('fontSelector').value;
+      const size = document.getElementById('sizeSelector').value;
+      const weight = document.getElementById('weightSelector').value;
+      const color = document.getElementById('colorSelector').value;
+
+      const filename = `font-${font}_size-${size}_weight-${weight}_color-${color}.png`;
+      currentImageURL = `${BASE_URL}${filename}`;
+
+      // Update all three preview images
+      document.getElementById('previewImg1').src = currentImageURL;
+      document.getElementById('previewImg2').src = currentImageURL;
+      document.getElementById('previewImg3').src = currentImageURL;
+
+      // Update info text
+      const fontDisplay = font === 'opensans' ? 'Open Sans' : font === 'inter' ? 'Inter' : 'Times';
+      const weightDisplay = weight.charAt(0).toUpperCase() + weight.slice(1);
+      const colorDisplay = color === 'darkgray' ? 'Dark Gray' : color.charAt(0).toUpperCase() + color.slice(1);
+
+      document.getElementById('imageInfo').textContent =
+        `Current Style: ${fontDisplay} • ${size}pt • ${weightDisplay} • ${colorDisplay}`;
+    }
+
+    function copyCurrentURL() {
+      navigator.clipboard.writeText(currentImageURL).then(() => {
+        showToast('Image URL copied to clipboard!');
+      });
+    }
+
+    function copyCurrentHTML() {
+      const tag = `<img src="${currentImageURL}" alt="Current Date">`;
+      navigator.clipboard.writeText(tag).then(() => {
+        showToast('HTML code copied to clipboard!');
+      });
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    // FAQ Accordion Logic
+    document.addEventListener('DOMContentLoaded', () => {
+      // Initialize image tool
+      ['fontSelector', 'sizeSelector', 'weightSelector', 'colorSelector'].forEach(id => {
+        document.getElementById(id).addEventListener('change', updateImage);
+      });
+      updateImage();
+
+      // FAQ accordions
+      document.querySelectorAll('.faq-trigger').forEach(trigger => {
+        trigger.addEventListener('click', () => {
+          const content = trigger.nextElementSibling;
+          const icon = trigger.querySelector('.faq-icon');
+
+          // Close all other FAQs
+          document.querySelectorAll('.faq-content').forEach(c => {
+            if (c !== content) {
+              c.classList.remove('open');
+            }
+          });
+          document.querySelectorAll('.faq-icon').forEach(i => {
+            if (i !== icon) {
+              i.classList.remove('rotate');
+            }
+          });
+
+          // Toggle current FAQ
+          content.classList.toggle('open');
+          icon.classList.toggle('rotate');
+        });
+      });
+
+      // Mobile menu
+      const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+      const mobileMenu = document.getElementById('mobileMenu');
+      const closeMobileMenu = document.getElementById('closeMobileMenu');
+
+      mobileMenuBtn.addEventListener('click', () => {
+        mobileMenu.classList.add('active');
+      });
+
+      closeMobileMenu.addEventListener('click', () => {
+        mobileMenu.classList.remove('active');
+      });
+
+      // Close mobile menu when clicking links
+      mobileMenu.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+          mobileMenu.classList.remove('active');
+        });
+      });
+
+      // Smooth scroll behavior for anchor links
+      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+          e.preventDefault();
+          const target = document.querySelector(this.getAttribute('href'));
+          if (target) {
+            const offsetTop = target.offsetTop - 80; // Account for fixed header
+            window.scrollTo({
+              top: offsetTop,
+              behavior: 'smooth'
+            });
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>
